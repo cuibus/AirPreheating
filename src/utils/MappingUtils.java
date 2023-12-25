@@ -52,11 +52,18 @@ public class MappingUtils {
 		return result.toString();
 	}
 	
-	public static double[] Mapping_double(IChromosome chr, int startIndex, int nrDoubles) {
+	public static double[] Mapping_double10step(IChromosome chr, int startIndex, int nrDoubles) {
 		double[] doubles = new double[nrDoubles];
 		for (int i=0;i<nrDoubles;i++)
-			doubles[i] = ((Double)chr.getGene(startIndex+i).getAllele()).doubleValue();
+			doubles[i] = ((Integer)chr.getGene(startIndex+i).getAllele()).intValue() / 10.0;
 		return doubles;
+	}
+
+	public static double[] Mapping_integer(IChromosome chr, int startIndex, int nrInts) {
+		double[] ints = new double[nrInts];
+		for (int i=0;i<nrInts;i++)
+			ints[i] = ((Integer)chr.getGene(startIndex+i).getAllele()).intValue();
+		return ints;
 	}
 	
 	public static String mapping_2x1_follower_input2() {

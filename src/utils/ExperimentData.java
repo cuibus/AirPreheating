@@ -8,8 +8,8 @@ public class ExperimentData {
 
 	public void checkHasNaN() {
 		for (InRecord inrec : inputData) {
-			if (Double.isNaN(inrec.airTemp) ||
-				Double.isNaN(inrec.earthTemp))
+			if (Double.isNaN(inrec.t4) ||
+				Double.isNaN(inrec.t7))
 					throw new RuntimeException("has NaN at " + inrec.time);
 		}
 	}

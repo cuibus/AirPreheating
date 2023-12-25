@@ -1,4 +1,4 @@
-package GA.scenario1;
+package GA.scenario0;
 
 import org.jgap.*;
 import org.jgap.impl.DefaultConfiguration;
@@ -12,14 +12,21 @@ public class MainGA {
 	private static final int MAX_ALLOWED_EVOLUTIONS = 500;
 	public static ExperimentData[] experiments = new ExperimentData[] {
 			// scenario 1: air doesn't flow through pipe
-			CSVUtils.loadInputCSV("./data/scenario1_0.txt"),
+			CSVUtils.loadInputCSV("./data/scenario0_1.txt"),
+			CSVUtils.loadInputCSV("./data/scenario0_2.txt"),
 	};
 	public static Solution bestSoFar =
-			new Solution("{[<NL><NL><NM><NL><PM>][<ZR><PM><ZR><NM><PM>][<NM><PL><PM><NL><NM>][<ZR><NL><PL><ZR><PL>][<ZR><PM><PL><NM><PM>]}",
-					"{[<ZR><ZR><NL><NM><NM>][<NM><PM><ZR><NL><NM>][<ZR><PM><PM><PL><PM>][<NM><PL><ZR><PM><PM>][<PM><ZR><PM><NM><NM>]}",
-					0.9,0.6,0.3,0.6,0.4,0.5,
-					6.0
-			); // fitness 7.679709248841521
+//			new Solution("{[<PL><ZR><ZR><PM><NM>][<PL><ZR><PL><NM><ZR>][<ZR><PM><PL><ZR><PM>][<PM><PL><PL><PL><NL>][<PL><NL><ZR><PL><NM>]}",
+//					"{[<NL><PM><NM><PM><PL>]}",
+//					0.2,1.0,0.3,0.2,
+//					37.0
+//			); // fitness 1.2981826961288585
+			new Solution("{[<NL><ZR><PL><PL><PL>][<ZR><ZR><NL><NM><NM>][<NL><NM><NM><PM><ZR>][<NL><ZR><NL><NL><PL>][<PL><NM><PL><PL><PL>]}",
+					"{[<ZR><PL><NL><PM><NM>]}",
+					0.2,0.5,0.6,0.1,
+					25.0
+			); // fitness 4.712237284181471
+	//Fitness: 0.0 Tables: T4: {[<PM><NM><PM><ZR><PM>][<PM><ZR><NL><NL><ZR>][<ZR><ZR><ZR><ZR><PM>][<NM><ZR><ZR><ZR><NM>][<NM><NM><PM><PM><PL>]} T6: {[<PM><PL><ZR><PM><PL>]} w74, w24, w45, w26 : 0.4,0.8,1.0,0.3 initial ground inertia: 20.0
 
 	public static void main(String[] args) throws InvalidConfigurationException{
 		Configuration conf = new DefaultConfiguration();
@@ -32,13 +39,13 @@ public class MainGA {
 		conf.setFitnessFunction(new PreHeatingFitnessFunction());
 		
 		// prepare sample genes
-		int nrGenes = 25 + 25 + 6 + 1;
+		int nrGenes = 25 + 5 + 4 + 1;
 		Gene[] sampleGenes = new Gene[nrGenes];
-		for (int i=0;i<25+25;i++) //t0
+		for (int i=0;i<25+5;i++) //t4 si t6
 			sampleGenes[i] = new IntegerGene(conf, 0, 4);
-		for (int i=25+25;i<25+25+6;i++)
+		for (int i=30;i<30+4;i++)
 			sampleGenes[i] = new IntegerGene(conf, 1, 10); // 0.1, 0.2, .. 1.0
-		sampleGenes[56] = new IntegerGene(conf, -15, 15); // air thermal inertia
+		sampleGenes[34] = new IntegerGene(conf, 0, 50); // earth thermal inertia
 
 		IChromosome sampleChromosome = new Chromosome(conf, sampleGenes);
 		conf.setSampleChromosome(sampleChromosome);
@@ -46,20 +53,20 @@ public class MainGA {
 		Genotype population = Genotype.randomInitialGenotype(conf);
 		if (bestSoFar != null)
 			GeneticUtils.replaceChr(population,
-					bestSoFar.tableT0, bestSoFar.tableT2, bestSoFar.w, bestSoFar.initialAirInertia,
+					bestSoFar.tableT4, bestSoFar.tableT6, bestSoFar.w, bestSoFar.initialGroundInertia,
 					new PreHeatingFitnessFunction());
 	
 		for (int i = 0; i < MAX_ALLOWED_EVOLUTIONS; i++) {
 			population.evolve();
 			IChromosome bestChrSoFar = population.getFittestChromosome();
-			double[] w = MappingUtils.Mapping_double10step(bestChrSoFar, 50, 6);
-			double[] initialAirInertia = MappingUtils.Mapping_integer(bestChrSoFar, 56, 1);
+			double[] w = MappingUtils.Mapping_double10step(bestChrSoFar, 30, 4);
+			double[] initialGroundInertia = MappingUtils.Mapping_integer(bestChrSoFar, 34, 1);
 			System.out.println(i + ". " +
 					"Fitness: " + bestChrSoFar.getFitnessValue() +
-					" Tables: T0: " + MappingUtils.Mapping_2x1(bestChrSoFar, 0) +
-					" T2: " + MappingUtils.Mapping_2x1(bestChrSoFar, 25) +
-					" w60, w00, w11, w02, w22, w33 : " + w[0] + "," + w[1] + "," + w[2] + "," + w[3] + "," + w[4] + "," + w[5] +
-					" initial air inertia: " + initialAirInertia[0]);
+					" Tables: T4: " + MappingUtils.Mapping_2x1(bestChrSoFar, 0) +
+					" T6: " + MappingUtils.Mapping_1x1(bestChrSoFar, 25) +
+					" w74, w24, w45, w26 : " + w[0] + "," + w[1] + "," + w[2] + "," + w[3] +
+					" initial ground inertia: " + initialGroundInertia[0]);
 		}
 
 	}

@@ -21,15 +21,18 @@ public class CSVUtils {
 			while ((line  = reader.readLine())!= null) {
 				String[] tokens = line.split(";");
 
-				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 				LocalDate date = LocalDate.parse(tokens[0], formatter);
 
-				double earthTemp = getDouble(tokens[1]);
-				double airTemp = getDouble(tokens[2]);
-				double outTemp = getDouble(tokens[3]);
-				double pipeTemp = getDouble(tokens[4]);
+				double t1 = getDouble(tokens[1]);
+				double t2 = getDouble(tokens[2]);
+				double t3 = getDouble(tokens[3]);
+				double t4 = getDouble(tokens[4]);
+				double t5 = getDouble(tokens[5]);
+				double t6 = getDouble(tokens[6]);
+				double t7 = getDouble(tokens[7]);
 
-				InRecord r = new InRecord(date, earthTemp, airTemp, outTemp, pipeTemp);
+				InRecord r = new InRecord(date, t1, t2, t3, t4, t5, t6, t7);
 				exp.inputData.add(r);
 			}
 			reader.close();
@@ -40,7 +43,25 @@ public class CSVUtils {
 		} 
 		return exp;
 	}
-	
+
+	public static void writeToCSV(double[] simulatedData, double[] measuredData,
+								  String simulatedName, String measuredName, String filepath) {
+		try
+		{
+			File f = new File(filepath);
+			PrintWriter pw = new PrintWriter(f);
+
+			pw.println(simulatedName + ";" + measuredName);
+			for (int i=0;i<simulatedData.length;i++)
+				pw.println(simulatedData[i] + ";" + measuredData[i]);
+			pw.close();
+		}
+		catch(IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+
 	private static double getDouble(String s) {
 		try {
 			return Double.parseDouble(s);
